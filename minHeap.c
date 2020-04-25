@@ -126,3 +126,7 @@ void printHeap() {
     for (int i = 0; i < size; ++i)
         printf("%d ", minHeap.array[i]->cost);
 }
+
+int isHeapEmpty() {
+    return minHeap.size == 0;
+}

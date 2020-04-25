@@ -4,7 +4,7 @@
 #define NEIGHBORS 4
 
 typedef struct vertex {
-    int index, weight, cost, prevShortest;
+    int index, weight, cost, prevShortest, visited;
     char type;
     struct vertex* next[NEIGHBORS];
 } VERTEX;
@@ -32,5 +32,6 @@ void heapAdd(VERTEX* vertex);
 void heapifyUp();
 void initializeHeap();
 void printHeap();
+int isHeapEmpty();
 
 #endif //POPOLVAR_MINHEAP_H

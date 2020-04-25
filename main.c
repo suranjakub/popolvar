@@ -116,7 +116,7 @@ VERTEX** createVertexList(VERTEX** vertexList, int nOfVerteces) {
 
     for (int i = 0; i < nOfVerteces; ++i) {
         vertexList[i] = (VERTEX*)malloc(sizeof(VERTEX));
-        vertexList[i]->weight = vertexList[i]->cost =0;
+        vertexList[i]->weight = vertexList[i]->cost = vertexList[i]->visited = 0;
         for (int j = 0; j < NEIGHBORS; ++j)
             vertexList[i]->next[j] = NULL;
     }
@@ -136,6 +136,42 @@ void printVertexList(VERTEX** vertexList, int nOfVerteces) {
     }
 }
 
+void dijkstra(VERTEX **vertexList, int startingIdx, int nOfVerteces) {
+    vertexList[startingIdx]->cost = 0;
+    heapAdd(vertexList[startingIdx]);
+    for (int i = 0; i < nOfVerteces; ++i) {
+        if(i != startingIdx)
+            vertexList[i]->cost = INT_MAX;
+    }
+
+    while(!isHeapEmpty()) {
+        VERTEX* currentVertex = heapGetMin();
+
+        for (int i = 0; i < NEIGHBORS; ++i) {
+            VERTEX* currentNeighbor = currentVertex->next[i];
+            //if neighbor exist
+            if (currentNeighbor != NULL) {
+                //and wasn't visited then examine this
+                if (currentNeighbor->visited == 0) {
+                    int costFromStart = currentVertex->cost + currentNeighbor->weight;
+                    if (costFromStart < currentNeighbor->cost) {
+                        //updated smallest cost from start
+                        currentNeighbor->cost = costFromStart;
+                        //set new previous point which leads to this smaller cost
+                        currentNeighbor->prevShortest = currentVertex->index;
+                        heapAdd(currentNeighbor);
+                    }
+                }
+            }
+        }
+        //we examined current vertex, we can throw it away from heap
+        heapExtractMin();
+        currentVertex->visited = 1;
+    }
+
+    printf("Dijkstra done!");
+}
+
 int main()
 {
     //map handling
@@ -150,9 +186,14 @@ int main()
     vertexList = transformToGraph(map, vertexList);
     printVertexList(vertexList, nOfVerteces);
 
+    dijkstra(vertexList, 0, nOfVerteces);
+    printf("\nDragon previous: %d", vertexList[10]->prevShortest);
+
+    /*
     //working with minHeap
     printf("\nminHeap:\n");
     initializeHeap();
+    printf("is empty?: %d\n", isHeapEmpty());
     vertexList[0]->cost = 10;
     vertexList[1]->cost = 13;
     vertexList[2]->cost = 7;
@@ -164,6 +205,8 @@ int main()
     printf("\n");
     heapExtractMin();
     printHeap();
+    printf("\nis empty?: %d\n", isHeapEmpty());
+    */
 
     return 0;
 }
