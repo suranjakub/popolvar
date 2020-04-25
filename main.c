@@ -138,10 +138,12 @@ void printVertexList(VERTEX** vertexList, int nOfVerteces) {
 
 int main()
 {
+    //map handling
     MAP map;
     map = loadMap(map);
     printMap(map);
 
+    //working with vertices
     int nOfVerteces = map.n * map.m;
     VERTEX** vertexList;
     vertexList = createVertexList(vertexList, nOfVerteces);
