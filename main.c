@@ -2,18 +2,20 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#define NEIGHBORS 4
+#include "minHeap.h"
+
+//#define NEIGHBORS 4
 
 typedef struct map {
     int n, m, tDwake;
     char** ptr;
 } MAP;
 
-typedef struct vertex {
+/*typedef struct vertex {
     int index, weight, cost, prevShortest;
     char type;
     struct vertex* next[NEIGHBORS];
-} VERTEX;
+} VERTEX;*/
 
 MAP loadMap(MAP map)
 {
@@ -82,7 +84,7 @@ VERTEX** transformToGraph(MAP map, VERTEX** vertexList)
             for (int k = 0; k < NEIGHBORS; ++k)
                 vertexList[index]->next[k] = NULL;
 
-            //add neighbors
+            //Add neighbors
             //right
             if (j + 1 < map.m && symbol != 'N' ) {
                 if (map.ptr[i][j + 1] == 'C' || map.ptr[i][j + 1] == 'H')
@@ -145,6 +147,21 @@ int main()
     vertexList = createVertexList(vertexList, nOfVerteces);
     vertexList = transformToGraph(map, vertexList);
     printVertexList(vertexList, nOfVerteces);
+
+    //working with minHeap
+    printf("\nminHeap:\n");
+    initializeHeap();
+    vertexList[0]->cost = 10;
+    vertexList[1]->cost = 13;
+    vertexList[2]->cost = 7;
+    heapAdd(vertexList[0]);
+    heapAdd(vertexList[1]);
+    heapAdd(vertexList[2]);
+    printHeap();
+
+    printf("\n");
+    heapExtractMin();
+    printHeap();
 
     return 0;
 }
