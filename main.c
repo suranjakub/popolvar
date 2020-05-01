@@ -87,22 +87,22 @@ VERTEX** transformToGraph(MAP map, VERTEX** vertexList)
             //Add neighbors
             //right
             if (j + 1 < map.m && symbol != 'N' ) {
-                if (map.ptr[i][j + 1] == 'C' || map.ptr[i][j + 1] == 'H')
+                if (map.ptr[i][j + 1] == 'C' || map.ptr[i][j + 1] == 'H' || map.ptr[i][j + 1] == 'P' || map.ptr[i][j + 1] == 'D')
                     vertexList[index]->next[0] = vertexList[index + 1];
             }
             //bottom
             if (i + 1 < map.n && symbol != 'N' ) {
-                if (map.ptr[i + 1][j] == 'C' || map.ptr[i + 1][j] == 'H')
+                if (map.ptr[i + 1][j] == 'C' || map.ptr[i + 1][j] == 'H' || map.ptr[i + 1][j] == 'P' || map.ptr[i + 1][j] == 'D')
                     vertexList[index]->next[1] = vertexList[index + cols];
             }
             //left
-            if (j - 1 > 0 && symbol != 'N' ) {
-                if (map.ptr[i][j - 1] == 'C' || map.ptr[i][j - 1] == 'H')
+            if (j - 1 >= 0 && symbol != 'N' ) {
+                if (map.ptr[i][j - 1] == 'C' || map.ptr[i][j - 1] == 'H' || map.ptr[i][j - 1] == 'P' || map.ptr[i][j - 1] == 'D')
                     vertexList[index]->next[2] = vertexList[index - 1];
             }
             //top
-            if ( i - 1 > 0 && symbol != 'N' ) {
-                if (map.ptr[i - 1][j] == 'C' || map.ptr[i - 1][j] == 'H')
+            if (i - 1 >= 0 && symbol != 'N' ) {
+                if (map.ptr[i - 1][j] == 'C' || map.ptr[i - 1][j] == 'H' || map.ptr[i - 1][j] == 'P' || map.ptr[i - 1][j] == 'D')
                     vertexList[index]->next[3] = vertexList[index - cols];
             }
         }
@@ -144,6 +144,7 @@ void dijkstra(VERTEX **vertexList, int startingIdx, int nOfVerteces) {
             vertexList[i]->cost = INT_MAX;
     }
 
+    printHeap();
     while(!isHeapEmpty()) {
         VERTEX* currentVertex = heapGetMin();
 
@@ -164,12 +165,31 @@ void dijkstra(VERTEX **vertexList, int startingIdx, int nOfVerteces) {
                 }
             }
         }
+        printHeap();
         //we examined current vertex, we can throw it away from heap
         heapExtractMin();
         currentVertex->visited = 1;
+        printHeap();
     }
 
     printf("Dijkstra done!");
+}
+
+void reconstructPathFromTo(int start, int index, VERTEX **vertexList, int max) {
+    int i = 0, end, previousIndex;
+    int* path = (int*)malloc(max * sizeof(int));
+    end = index;
+
+    while(index != start) {
+        previousIndex = vertexList[index]->prevShortest;
+        path[i++] = previousIndex;
+        index = previousIndex;
+    }
+    i--;
+
+    printf("\nPath from %d to %d: ", start, end);
+    for (int j = i; j >= 0; --j)
+        printf("%d ", path[j]);
 }
 
 int main()
@@ -187,7 +207,8 @@ int main()
     printVertexList(vertexList, nOfVerteces);
 
     dijkstra(vertexList, 0, nOfVerteces);
-    printf("\nDragon previous: %d", vertexList[10]->prevShortest);
+    reconstructPathFromTo(0, 8, vertexList, nOfVerteces);
+    //printf("\nDragon previous: %d", vertexList[8]->prevShortest);
 
     /*
     //working with minHeap
