@@ -174,7 +174,12 @@ void dijkstra(VERTEX **vertexList, int startingIndex, int nOfVerteces) {
 
 void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, int max) {
     int i, end, previousIndex, pathCost = 0;
-    int* path = (int*)malloc(max * sizeof(int));
+    int* path = (int*)malloc(30 * sizeof(int));
+    if(path == NULL) {
+        printf("Can't allocate path array!");
+        return;
+    }
+    //remeber end index
     end = index;
 
     //insert end index to path
@@ -197,6 +202,8 @@ void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, i
         printf("%d %d\n", x, y);
     }
     printf("Cost: %d", vertexList[end]->cost);
+
+    free(path);
 }
 
 int main()
@@ -214,7 +221,8 @@ int main()
     printVertexList(vertexList, nOfVerteces);
 
     dijkstra(vertexList, 0, nOfVerteces);
-    reconstructPathFromTo(0, 8, map, vertexList, nOfVerteces);
+    reconstructPathFromTo(0, 20, map, vertexList, nOfVerteces);
+    reconstructPathFromTo(20, 50, map, vertexList, nOfVerteces);
 
     //printf("\nDragon previous: %d", vertexList[8]->prevShortest);
 
