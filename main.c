@@ -68,7 +68,7 @@ VERTEX** transformToGraph(MAP map, VERTEX** vertexList)
 
             vertexList[index]->index = index;
 
-            if (symbol == 'C')
+            if (symbol == 'C' || symbol == 'D' || symbol == 'P')
                 vertexList[index]->weight = 1;
             else if (symbol == 'H')
                 vertexList[index]->weight = 2;
@@ -136,15 +136,14 @@ void printVertexList(VERTEX** vertexList, int nOfVerteces) {
     }
 }
 
-void dijkstra(VERTEX **vertexList, int startingIdx, int nOfVerteces) {
-    vertexList[startingIdx]->cost = 0;
-    heapAdd(vertexList[startingIdx]);
+void dijkstra(VERTEX **vertexList, int startingIndex, int nOfVerteces) {
+    vertexList[startingIndex]->cost = 1;
+    heapAdd(vertexList[startingIndex]);
     for (int i = 0; i < nOfVerteces; ++i) {
-        if(i != startingIdx)
+        if(i != startingIndex)
             vertexList[i]->cost = INT_MAX;
     }
 
-    printHeap();
     while(!isHeapEmpty()) {
         VERTEX* currentVertex = heapGetMin();
 
@@ -165,21 +164,24 @@ void dijkstra(VERTEX **vertexList, int startingIdx, int nOfVerteces) {
                 }
             }
         }
-        printHeap();
         //we examined current vertex, we can throw it away from heap
         heapExtractMin();
         currentVertex->visited = 1;
-        printHeap();
     }
 
-    printf("Dijkstra done!");
+    printf("\nDijkstra done!\n");
 }
 
-void reconstructPathFromTo(int start, int index, VERTEX **vertexList, int max) {
-    int i = 0, end, previousIndex;
+void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, int max) {
+    int i, end, previousIndex, pathCost = 0;
     int* path = (int*)malloc(max * sizeof(int));
     end = index;
 
+    //insert end index to path
+    path[0] = end;
+    i = 1;
+
+    //reconstruct path from end to start
     while(index != start) {
         previousIndex = vertexList[index]->prevShortest;
         path[i++] = previousIndex;
@@ -187,9 +189,14 @@ void reconstructPathFromTo(int start, int index, VERTEX **vertexList, int max) {
     }
     i--;
 
-    printf("\nPath from %d to %d: ", start, end);
-    for (int j = i; j >= 0; --j)
-        printf("%d ", path[j]);
+    printf("\nPath from %d to %d:\n", start, end);
+    for (int j = i; j >= 0; --j) {
+        int x = path[j] % map.m;
+        int y = path[j] / map.n;
+        //printf("%d ", path[j]);
+        printf("%d %d\n", x, y);
+    }
+    printf("Cost: %d", vertexList[end]->cost);
 }
 
 int main()
@@ -207,7 +214,8 @@ int main()
     printVertexList(vertexList, nOfVerteces);
 
     dijkstra(vertexList, 0, nOfVerteces);
-    reconstructPathFromTo(0, 8, vertexList, nOfVerteces);
+    reconstructPathFromTo(0, 8, map, vertexList, nOfVerteces);
+
     //printf("\nDragon previous: %d", vertexList[8]->prevShortest);
 
     /*
