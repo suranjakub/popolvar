@@ -5,6 +5,7 @@
 #include "minHeap.h"
 
 //#define NEIGHBORS 4
+#define MAX_PRINCESS 5
 
 typedef struct map {
     int n, m, tDwake;
@@ -229,6 +230,13 @@ void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, i
     free(path);
 }
 
+void saveThePrincesses(VERTEX **vertexList, int nOfVertices) {
+    //indexes of dragon & princesses
+    int dragon, princess[MAX_PRINCESS];
+
+    
+}
+
 int main()
 {
     //map handling
@@ -245,26 +253,26 @@ int main()
 
     //run smallest cost path finding to Dragon
     int start = 0, end = 20;
-    vertexList = dijkstra(vertexList, start, nOfVertices);
+    dijkstra(vertexList, start, nOfVertices);
     reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
     freeHeap();
 
     //run smallest cost path finding from D to P1
     start = 20, end = 50;
-    vertexList = clearVertexList(vertexList, nOfVertices, start);
-    vertexList = dijkstra(vertexList, start, nOfVertices);
+    clearVertexList(vertexList, nOfVertices, start);
+    dijkstra(vertexList, start, nOfVertices);
     reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
 
     //run smallest cost path finding from P1 to P2
     start = 50, end = 75;
-    vertexList = clearVertexList(vertexList, nOfVertices, start);
-    vertexList = dijkstra(vertexList, start, nOfVertices);
+    clearVertexList(vertexList, nOfVertices, start);
+    dijkstra(vertexList, start, nOfVertices);
     reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
 
     //run smallest cost path finding from P2 to P3
     start = 75, end = 93;
-    vertexList = clearVertexList(vertexList, nOfVertices, start);
-    vertexList = dijkstra(vertexList, start, nOfVertices);
+    clearVertexList(vertexList, nOfVertices, start);
+    dijkstra(vertexList, start, nOfVertices);
     reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
 
     /*free(vertexList);
