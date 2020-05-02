@@ -2,6 +2,7 @@
 #define POPOLVAR_MINHEAP_H
 
 #define NEIGHBORS 4
+#define INIT_SIZE 100
 
 typedef struct vertex {
     int index, weight, cost, prevShortest, visited;
@@ -31,6 +32,7 @@ void heapifyDown();
 void heapAdd(VERTEX* vertex);
 void heapifyUp();
 void initializeHeap();
+void freeHeap();
 void printHeap();
 int isHeapEmpty();
 

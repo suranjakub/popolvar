@@ -137,6 +137,7 @@ void printVertexList(VERTEX** vertexList, int nOfVerteces) {
 }
 
 void dijkstra(VERTEX **vertexList, int startingIndex, int nOfVerteces) {
+    initializeHeap();
     vertexList[startingIndex]->cost = 1;
     heapAdd(vertexList[startingIndex]);
     for (int i = 0; i < nOfVerteces; ++i) {
@@ -169,6 +170,7 @@ void dijkstra(VERTEX **vertexList, int startingIndex, int nOfVerteces) {
         currentVertex->visited = 1;
     }
 
+    freeHeap();
     printf("\nDijkstra done!\n");
 }
 
@@ -178,7 +180,7 @@ void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, i
         printf("Vertices aren't in range!");
         return;
     }
-    
+
     int i, end, previousIndex, pathCost = 0;
     int* path = (int*)malloc(30 * sizeof(int));
     if(path == NULL) {
@@ -226,10 +228,20 @@ int main()
     vertexList = transformToGraph(map, vertexList);
     printVertexList(vertexList, nOfVertices);
 
-    initializeHeap();
     dijkstra(vertexList, 0, nOfVertices);
     reconstructPathFromTo(0, 20, map, vertexList, nOfVertices);
-    //reconstructPathFromTo(20, 50, map, vertexList, nOfVertices);
+
+    free(vertexList);
+
+    VERTEX **vertexList2 = NULL;
+    vertexList2 = createVertexList(vertexList2, nOfVertices);
+    vertexList2 = transformToGraph(map, vertexList2);
+    dijkstra(vertexList2, 20, nOfVertices);
+    reconstructPathFromTo(20, 50, map, vertexList2, nOfVertices);
+
+    /*initializeHeap();
+    dijkstra(vertexList, 0, nOfVertices);
+    reconstructPathFromTo(20, 50, map, vertexList, nOfVertices);*/
 
     //printf("\nDragon previous: %d", vertexList[8]->prevShortest);
 

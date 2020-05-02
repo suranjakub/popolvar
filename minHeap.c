@@ -113,12 +113,20 @@ void heapifyUp() {
 }
 
 void initializeHeap() {
-    int capacity = minHeap.capacity = 10;
+    int capacity = minHeap.capacity = INIT_SIZE;
     minHeap.size = 0;
     minHeap.array = (VERTEX**)malloc(capacity * sizeof(VERTEX*));
-    minHeap.array[0] = NULL;
+    for (int i = 0; i < capacity; ++i) {
+        minHeap.array[i] = NULL;
+    }
     /*for (int i = 0; i < capacity; ++i)
         minHeap.array[i] = (VERTEX*)malloc(sizeof(VERTEX));*/
+}
+
+void freeHeap() {
+    minHeap.capacity = minHeap.size = 0;
+    free(minHeap.array);
+    minHeap.array = NULL;
 }
 
 void printHeap() {
