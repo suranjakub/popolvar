@@ -173,6 +173,12 @@ void dijkstra(VERTEX **vertexList, int startingIndex, int nOfVerteces) {
 }
 
 void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, int max) {
+    //if vertices aren't in range
+    if(start >= max || index >= max) {
+        printf("Vertices aren't in range!");
+        return;
+    }
+    
     int i, end, previousIndex, pathCost = 0;
     int* path = (int*)malloc(30 * sizeof(int));
     if(path == NULL) {
@@ -214,15 +220,16 @@ int main()
     printMap(map);
 
     //working with vertices
-    int nOfVerteces = map.n * map.m;
-    VERTEX** vertexList;
-    vertexList = createVertexList(vertexList, nOfVerteces);
+    int nOfVertices = map.n * map.m;
+    VERTEX **vertexList = NULL;
+    vertexList = createVertexList(vertexList, nOfVertices);
     vertexList = transformToGraph(map, vertexList);
-    printVertexList(vertexList, nOfVerteces);
+    printVertexList(vertexList, nOfVertices);
 
-    dijkstra(vertexList, 0, nOfVerteces);
-    reconstructPathFromTo(0, 20, map, vertexList, nOfVerteces);
-    reconstructPathFromTo(20, 50, map, vertexList, nOfVerteces);
+    initializeHeap();
+    dijkstra(vertexList, 0, nOfVertices);
+    reconstructPathFromTo(0, 20, map, vertexList, nOfVertices);
+    //reconstructPathFromTo(20, 50, map, vertexList, nOfVertices);
 
     //printf("\nDragon previous: %d", vertexList[8]->prevShortest);
 
