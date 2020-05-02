@@ -111,6 +111,20 @@ VERTEX** transformToGraph(MAP map, VERTEX** vertexList)
     return vertexList;
 }
 
+VERTEX** clearVertexList(VERTEX** vertexList, int nOfVertices, int startIndex) {
+    for (int i = 0; i < nOfVertices; ++i) {
+        if (i == startIndex)
+            vertexList[i]->cost = 1;
+        else
+            vertexList[i]->cost = INT_MAX;
+
+        vertexList[i]->visited = 0;
+        vertexList[i]->prevShortest = -1;
+    }
+
+    return vertexList;
+}
+
 VERTEX** createVertexList(VERTEX** vertexList, int nOfVerteces) {
     vertexList = (VERTEX**)malloc(nOfVerteces * sizeof(VERTEX*));
 
@@ -136,11 +150,11 @@ void printVertexList(VERTEX** vertexList, int nOfVerteces) {
     }
 }
 
-void dijkstra(VERTEX **vertexList, int startingIndex, int nOfVerteces) {
+VERTEX** dijkstra(VERTEX **vertexList, int startingIndex, int nOfVertices) {
     initializeHeap();
     vertexList[startingIndex]->cost = 1;
     heapAdd(vertexList[startingIndex]);
-    for (int i = 0; i < nOfVerteces; ++i) {
+    for (int i = 0; i < nOfVertices; ++i) {
         if(i != startingIndex)
             vertexList[i]->cost = INT_MAX;
     }
@@ -172,6 +186,7 @@ void dijkstra(VERTEX **vertexList, int startingIndex, int nOfVerteces) {
 
     freeHeap();
     printf("\nDijkstra done!\n");
+    return vertexList;
 }
 
 void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, int max) {
@@ -182,7 +197,7 @@ void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, i
     }
 
     int i, end, previousIndex, pathCost = 0;
-    int* path = (int*)malloc(30 * sizeof(int));
+    int* path = (int*)malloc(100 * sizeof(int));
     if(path == NULL) {
         printf("Can't allocate path array!");
         return;
@@ -228,41 +243,38 @@ int main()
     vertexList = transformToGraph(map, vertexList);
     printVertexList(vertexList, nOfVertices);
 
-    dijkstra(vertexList, 0, nOfVertices);
-    reconstructPathFromTo(0, 20, map, vertexList, nOfVertices);
+    //run smallest cost path finding to Dragon
+    int start = 0, end = 20;
+    vertexList = dijkstra(vertexList, start, nOfVertices);
+    reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
+    freeHeap();
 
-    free(vertexList);
+    //run smallest cost path finding from D to P1
+    start = 20, end = 50;
+    vertexList = clearVertexList(vertexList, nOfVertices, start);
+    vertexList = dijkstra(vertexList, start, nOfVertices);
+    reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
+
+    //run smallest cost path finding from P1 to P2
+    start = 50, end = 75;
+    vertexList = clearVertexList(vertexList, nOfVertices, start);
+    vertexList = dijkstra(vertexList, start, nOfVertices);
+    reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
+
+    //run smallest cost path finding from P2 to P3
+    start = 75, end = 93;
+    vertexList = clearVertexList(vertexList, nOfVertices, start);
+    vertexList = dijkstra(vertexList, start, nOfVertices);
+    reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
+
+    /*free(vertexList);
 
     VERTEX **vertexList2 = NULL;
     vertexList2 = createVertexList(vertexList2, nOfVertices);
     vertexList2 = transformToGraph(map, vertexList2);
     dijkstra(vertexList2, 20, nOfVertices);
-    reconstructPathFromTo(20, 50, map, vertexList2, nOfVertices);
+    reconstructPathFromTo(20, 50, map, vertexList2, nOfVertices);*/
 
-    /*initializeHeap();
-    dijkstra(vertexList, 0, nOfVertices);
-    reconstructPathFromTo(20, 50, map, vertexList, nOfVertices);*/
-
-    //printf("\nDragon previous: %d", vertexList[8]->prevShortest);
-
-    /*
-    //working with minHeap
-    printf("\nminHeap:\n");
-    initializeHeap();
-    printf("is empty?: %d\n", isHeapEmpty());
-    vertexList[0]->cost = 10;
-    vertexList[1]->cost = 13;
-    vertexList[2]->cost = 7;
-    heapAdd(vertexList[0]);
-    heapAdd(vertexList[1]);
-    heapAdd(vertexList[2]);
-    printHeap();
-
-    printf("\n");
-    heapExtractMin();
-    printHeap();
-    printf("\nis empty?: %d\n", isHeapEmpty());
-    */
 
     return 0;
 }
