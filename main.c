@@ -186,22 +186,22 @@ VERTEX** dijkstra(VERTEX **vertexList, int startingIndex, int nOfVertices) {
     }
 
     freeHeap();
-    printf("\nDijkstra done!\n");
+    //printf("\n\nDijkstra done!\n");
     return vertexList;
 }
 
-void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, int max) {
+int reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, int max) {
     //if vertices aren't in range
     if(start >= max || index >= max) {
         printf("Vertices aren't in range!");
-        return;
+        return 0;
     }
 
     int i, end, previousIndex, pathCost = 0;
     int* path = (int*)malloc(100 * sizeof(int));
     if(path == NULL) {
         printf("Can't allocate path array!");
-        return;
+        return 0;
     }
     //remeber end index
     end = index;
@@ -218,23 +218,76 @@ void reconstructPathFromTo(int start, int index, MAP map, VERTEX **vertexList, i
     }
     i--;
 
-    printf("\nPath from %d to %d:\n", start, end);
+    //printf("\nPath from %d to %d:\n", start, end);
     for (int j = i; j >= 0; --j) {
         int x = path[j] % map.m;
         int y = path[j] / map.n;
         //printf("%d ", path[j]);
         printf("%d %d\n", x, y);
     }
-    printf("Cost: %d", vertexList[end]->cost);
+    //printf("Cost: %d", vertexList[end]->cost);
+    pathCost = vertexList[end]->cost;
 
     free(path);
+    return pathCost;
 }
 
-void saveThePrincesses(VERTEX **vertexList, int nOfVertices) {
-    //indexes of dragon & princesses
-    int dragon, princess[MAX_PRINCESS];
+int findDragon(int* dragon, VERTEX **vertexList, int nOfVertices) {
+    for (int i = 0; i < nOfVertices; ++i) {
+        if (vertexList[i]->type == 'D') {
+            *dragon = i;
+            return i;
+        }
+    }
 
-    
+    return -1;
+}
+
+int findPrincesses(int* princess, int* NofPrincesses, VERTEX **vertexList, int nOfVertices) {
+    int j = 0;
+
+    for (int i = 0; i < nOfVertices; ++i) {
+        if (vertexList[i]->type == 'P') {
+            princess[j++] = i;
+        }
+    }
+
+    *NofPrincesses = j;
+    if(j >= 1)
+        return 1;
+    return 0;
+}
+
+void saveThePrincesses(VERTEX **vertexList, int nOfVertices, MAP map) {
+    //indexes of dragon & princesses
+    int dragon, princess[MAX_PRINCESS], NofPrincesses = 0;
+
+    findDragon(&dragon, vertexList, nOfVertices);
+    findPrincesses(princess, &NofPrincesses, vertexList, nOfVertices);
+
+    printf("\nDragon index: %d\n", dragon);
+    for (int i = 0; i < NofPrincesses; ++i) {
+        printf("P%d: %d ", i, princess[i]);
+    }
+
+    printf("\n\nFound path: \n");
+    //run smallest cost path finding to Dragon
+    int start = 0, end = dragon, pathCost = 0;
+    dijkstra(vertexList, start, nOfVertices);
+    pathCost += reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
+
+    //run smallest cost path finding from Dragon to princesses
+    for (int j = 0; j < NofPrincesses; ++j) {
+        if (j == 0)
+            start = dragon, end = princess[j];
+        else
+            start = princess[j-1], end = princess[j];
+        clearVertexList(vertexList, nOfVertices, start);
+        dijkstra(vertexList, start, nOfVertices);
+        pathCost += reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
+    }
+
+    printf("\nPath cost: %d", pathCost);
 }
 
 int main()
@@ -252,10 +305,9 @@ int main()
     printVertexList(vertexList, nOfVertices);
 
     //run smallest cost path finding to Dragon
-    int start = 0, end = 20;
+    /*int start = 0, end = 20;
     dijkstra(vertexList, start, nOfVertices);
     reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
-    freeHeap();
 
     //run smallest cost path finding from D to P1
     start = 20, end = 50;
@@ -273,16 +325,9 @@ int main()
     start = 75, end = 93;
     clearVertexList(vertexList, nOfVertices, start);
     dijkstra(vertexList, start, nOfVertices);
-    reconstructPathFromTo(start, end, map, vertexList, nOfVertices);
+    reconstructPathFromTo(start, end, map, vertexList, nOfVertices);*/
 
-    /*free(vertexList);
-
-    VERTEX **vertexList2 = NULL;
-    vertexList2 = createVertexList(vertexList2, nOfVertices);
-    vertexList2 = transformToGraph(map, vertexList2);
-    dijkstra(vertexList2, 20, nOfVertices);
-    reconstructPathFromTo(20, 50, map, vertexList2, nOfVertices);*/
-
+    saveThePrincesses(vertexList, nOfVertices, map);
 
     return 0;
 }
